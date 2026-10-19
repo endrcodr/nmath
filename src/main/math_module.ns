@@ -6,13 +6,18 @@ def mod(arg1, arg2): # Modulo function
     math_x = arg1 / arg2
     var lstr math_y
     var int math_z
-    until math_y = "." or math_y = "":
+    until bool.out:
         math_y = math_x[math_z]
         math_z += 1
+        bool math_y == "."
+        bool2 math_y == "" # Bool2 is an alternative to standard Bool for nested logic such as 'or' or 'and' functions. Here it is used to avoid the creation of a secondary variable for storage of the first Bool operation.
+        bool .out or .out2 # Loads the Bool logic from the previous two operations into an OR operation to get the final result
+    if math_y = "":
+        return math_x
     var int math_w = math_z
     math_z = 0
     math_y = ""
-    until math_z = math_w:
+    until math_z == math_w:
         math_y = math_y + math_x[math_z]
         math_z += 1
     mem.delvar math_w
@@ -24,4 +29,8 @@ def mod(arg1, arg2): # Modulo function
     return out
 
 def round(arg1): # Rounding function
-    
+    var int math_x
+    var int math_y
+    var int math_z
+    var lstr math_w
+    until bool.out:
