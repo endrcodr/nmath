@@ -45,3 +45,14 @@ def round(arg1): # Rounding function
         mem.delvar module_z
         mem.delvar module_w
         return arg1
+    bool 0 # Set bool.out to false
+    until bool.out:
+        
+
+
+    module_z = module_x
+    module_x = 0
+    until module_x = module_z:
+        module_w = module_w + arg1[module_x]
+        module_x += 1
+    
