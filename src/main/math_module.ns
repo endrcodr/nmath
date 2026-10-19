@@ -1,36 +1,47 @@
 # This is the Math module for the Nano Project. It is coded entirely in Nano and injects directly to Nano with the import function. Its codebase handle is 'math'.
 # Let's start with simple modules, like rounding and modulo.
-var int out
+var int module_out
 def mod(arg1, arg2): # Modulo function
-    var int math_x
+    var int module_x
     math_x = arg1 / arg2
-    var lstr math_y
-    var int math_z
+    var lstr module_y
+    var int module_z
     until bool.out:
-        math_y = math_x[math_z]
-        math_z += 1
-        bool math_y == "."
-        bool2 math_y == "" # Bool2 is an alternative to standard Bool for nested logic such as 'or' or 'and' functions. Here it is used to avoid the creation of a secondary variable for storage of the first Bool operation.
+        module_y = math_x[math_z]
+        module_z += 1
+        bool module_y == "."
+        bool2 module_y == "" # Bool2 is an alternative to standard Bool for nested logic such as 'or' or 'and' functions. Here it is used to avoid the creation of a secondary variable for storage of the first Bool operation.
         bool .out or .out2 # Loads the Bool logic from the previous two operations into an OR operation to get the final result
-    if math_y = "":
-        return math_x
-    var int math_w = math_z
-    math_z = 0
-    math_y = ""
+    if module_y = "":
+        return module_x
+    var int module_w = module_z
+    module_z = 0
+    module_y = ""
     until math_z == math_w:
-        math_y = math_y + math_x[math_z]
-        math_z += 1
-    mem.delvar math_w
-    mem.delvar math_x
-    mem.delvar math_z
-    math_y = math_y * 1
-    out = math_y
-    mem.delvar math_y
-    return out
+        module_y = module_y + math_x[math_z]
+        module_z += 1
+    math_y = module_y * 1
+    out = module_y
+    mem.delvar module_x
+    mem.delvar module_y
+    mem.delvar module_z
+    mem.delvar module_w
+    return module_out
 
 def round(arg1): # Rounding function
-    var int math_x
-    var int math_y
-    var int math_z
-    var lstr math_w
+    var int module_x
+    var str module_y
+    var int module_z
+    var lstr module_w
     until bool.out:
+        module_y = arg1[math_x]
+        module_x += 1
+        bool module_y == "."
+        bool2 module_y == ""
+        bool .out or .out2
+    if module_y == "":
+        mem.delvar module_x
+        mem.delvar module_y
+        mem.delvar module_z
+        mem.delvar module_w
+        return arg1
