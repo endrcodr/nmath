@@ -1,1 +1,27 @@
+# This is the Math module for the Nano Project. It is coded entirely in Nano and injects directly to Nano with the import function. Its codebase handle is 'math'.
+# Let's start with simple modules, like rounding and modulo.
+var int out
+def mod(arg1, arg2): # Modulo function
+    var int math_x
+    math_x = arg1 / arg2
+    var lstr math_y
+    var int math_z
+    until math_y = "." or math_y = "":
+        math_y = math_x[math_z]
+        math_z += 1
+    var int math_w = math_z
+    math_z = 0
+    math_y = ""
+    until math_z = math_w:
+        math_y = math_y + math_x[math_z]
+        math_z += 1
+    mem.delvar math_w
+    mem.delvar math_x
+    mem.delvar math_z
+    math_y = math_y * 1
+    out = math_y
+    mem.delvar math_y
+    return out
 
+def round(arg1): # Rounding function
+    
