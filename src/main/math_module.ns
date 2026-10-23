@@ -6,6 +6,7 @@ def mod(arg1, arg2): # Modulo function
     __x = arg1 / arg2
     var lstr __y
     var int __z
+    
     until bool.out:
         __y = __x[__z]
         __z += 1
@@ -13,14 +14,11 @@ def mod(arg1, arg2): # Modulo function
         bool2 __y == "" # Bool2 is an alternative to standard Bool for nested logic such as 'or' or 'and' functions. Here it is used to avoid the creation of a secondary variable for storage of the first Bool operation.
         bool .out or .out2 # Loads the Bool logic from the previous two operations into an OR operation to get the final result
     if __y = "":
-        return __x
+        return 0
     var int __w = __z
     __z = 0
     __y = ""
-    until __z == __w:
-        __y = __y + __x[__z]
-        __z += 1
-    __y = __y * 1
+    
     __out = __y
     return __out
 
