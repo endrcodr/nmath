@@ -1,27 +1,6 @@
 # This is the Math module for the Nano Project. It is coded entirely in Nano and injects directly to Nano with the import function. Its codebase handle is 'math'.
-# Let's start with simple modules, like rounding and modulo.
+# Let's start with simple modules, like rounding.
 var int __out
-def mod(arg1, arg2): # Modulo function
-    var int __x
-    __x = arg1 / arg2
-    var lstr __y
-    var int __z
-    
-    until bool.out:
-        __y = __x[__z]
-        __z += 1
-        bool __y == "."
-        bool2 __y == "" # Bool2 is an alternative to standard Bool for nested logic such as 'or' or 'and' functions. Here it is used to avoid the creation of a secondary variable for storage of the first Bool operation.
-        bool .out or .out2 # Loads the Bool logic from the previous two operations into an OR operation to get the final result
-    if __y = "":
-        return 0
-    var int __w = __z
-    __z = 0
-    __y = ""
-    
-    __out = __y
-    return __out
-
 def round(arg1): # Rounding function
     var int __x
     var str __y
