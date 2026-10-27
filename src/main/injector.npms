@@ -1,8 +1,8 @@
 # This file is what pushes the module into the code itself. It defines the name of the script, as well as holding the version, update date, and publisher data.
 # Package metadata
 packageName = "math"
-packageVersion = "0.1.0"
-updateDate = "10/19/26"
+packageVersion = "0.0.1"
+updateDate = "10/27/26"
 # Publisher data
 publisherName = "endrcodr"
 # SHA-256 Security Hash
