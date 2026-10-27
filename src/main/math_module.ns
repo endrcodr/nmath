@@ -3,15 +3,20 @@
 var int __out
 def round(arg1): # Rounding function
     var int __x
-    var str __y
+    var int __y
     var int __z
     var lstr __w
     until bool.out:
-        __y = arg1[__x]
-        __x += 1
-        bool __y == "."
-        bool2 __y == ""
+        bool arg1[__x] == "."
+        bool2 arg1[__x] == ""
         bool .out or .out2
-    if __y == "":
+        __w = __w + arg1[__x]
+        __x += 1
+    if arg1[__x] == "":
         return arg1
-    __x += 1
+    if int(arg1[__x]) >= 5:
+        __out = int(__w) + 1
+        ret __out
+    else:
+        __out = int(__w)
+        ret __out
