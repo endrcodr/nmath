@@ -3,9 +3,11 @@
 packageName = "math"
 packageVersion = "0.0.1"
 updateDate = "10/27/26"
+packageFileName = "math-module.ns"
 # Publisher data
 publisherName = "endrcodr"
 # SHA-256 Security Hash
 sha256 = "4da68a52928a79f0196ab9ee65cb9a195d8c7ee151adc575c59888155a586004"
+sha256-inj = "5dfdc430c4f7e2b046371feea36e6b31fb5bc194fefe71ef02fe6246135a03fa"
 # More metadata will probably be added later, but this is all we need for now.
 # .npms extension stands for "Nano Package Metadata Storage". It is used exclusively for .ns packages as a way of identifying the security of a package.
