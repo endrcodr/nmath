@@ -1,22 +1,562 @@
 # This is the Math module for the Nano Project. It is coded entirely in Nano and injects directly to Nano with the import function. Its codebase handle is 'math'.
-# Let's start with simple modules, like rounding.
-var int __out
-def round(arg1): # Rounding function
-    var int __x
-    var int __y
-    var int __z
-    var lstr __w
-    until bool.out:
-        bool arg1[__x] == "."
-        bool2 arg1[__x] == ""
-        bool .out or .out2
-        __w = __w + arg1[__x]
-        __x += 1
-    if arg1[__x] == "":
-        return arg1
-    if int(arg1[__x]) >= 5:
-        __out = int(__w) + 1
-        ret __out
+#
+# Use it:      i\ math_module.ns
+#              var num r = call(round, '3.7')          # 4
+#
+# Every function is a public class (only classes are shared between files; the defs and variables
+# below belong to this file alone). A class keeps its parameters as global names, so every parameter
+# here has its own unique name.
+#
+# Decimals are text: Nano numbers are whole numbers, so a decimal such as 3.7 is written as text '3.7'.
+#   round(text)     whole number nearest to the decimal, halves away from zero   ('2.5' -> 3, '-2.5' -> -3)
+#   floor(text)     largest whole number not above it                            ('-3.2' -> -4)
+#   ceil(text)      smallest whole number not below it                           ('-3.2' -> -3)
+#   trunc(text)     the whole part, the fraction dropped                         ('-3.9' -> -3)
+# Whole numbers:
+#   sin cos tan asin acos atan atan2 sin_m cos_m   (degrees, see 'trigonometry' below)
+#   abs(n)  sign(n)  min(a, b)  max(a, b)  clamp(n, low, high)  mod(a, b)
+#   pow(base, exp)  sqrt(n)  gcd(a, b)  lcm(a, b)  factorial(n)  isprime(n)
+# Text for the decimal functions: an optional - or +, digits, optionally a . and more digits.
+# A value that does not fit gives garbage (no overflow checks), except where noted below.
+#   sqrt(n) is the whole part of the square root, -1 for a negative n.
+#   pow(base, exp) is 0 for a negative exp (whole numbers only).
+#   factorial(n) is -1 for a negative n or an n above 20 (it would not fit in a number).
+#   mod(a, b) takes the sign of b like Python (mod(-1, 5) is 4); 0 when b is 0.
+#   gcd is never negative; lcm of 0 is 0.
+
+# ---- reading a decimal ----------------------------------------------------------------------
+# __neg 1 if it started with a minus, __ip the whole part, __fd the first digit after the point,
+# __fr 1 if any digit after the point is not zero, __fc how many digits came after the point.
+var num __neg = 0
+var num __ip = 0
+var num __fd = 0
+var num __fr = 0
+var num __fc = 0
+var num __f6 = 0
+var num __mu = 0
+
+def digit (str c) num:
+    var lstr ds = '0123456789'
+    var num k = 0
+    for k = 10:
+        if ds[k] == c:
+            ret k
+    ret -1
+
+def scan (lstr t):
+    var num i = 0
+    var num n = t.length
+    var num state = 0
+    var num d = 0
+    var str c = ' '
+    __neg = 0
+    __ip = 0
+    __fd = 0
+    __fr = 0
+    __fc = 0
+    __f6 = 0
+    for i = n:
+        c = t[i]
+        if c == '-':
+            if i == 0:
+                __neg = 1
+        elif c == '.':
+            state = 1
+        else:
+            d = digit(c)
+            if d >= 0:
+                if state == 0:
+                    __ip = __ip * 10 + d
+                else:
+                    __fc += 1
+                    if __fc == 1:
+                        __fd = d
+                    if __fc << 7:
+                        __f6 = __f6 * 10 + d
+                    if d > 0:
+                        __fr = 1
+    while __fc << 6:                          # pad the fraction to six digits
+        __f6 = __f6 * 10
+        __fc += 1
+    __mu = __ip * 1000000 + __f6              # the size of the decimal in millionths
+
+# ---- rounding -------------------------------------------------------------------------------
+class round (lstr rd_t):
+    var num rd_r = 0
+    scan(rd_t)
+    rd_r = __ip
+    if __fd >= 5:
+        rd_r += 1
+    if __neg == 1:
+        rd_r = 0 - rd_r
+    ret rd_r
+
+class floor (lstr fl_t):
+    var num fl_r = 0
+    scan(fl_t)
+    fl_r = __ip
+    if __neg == 1:
+        if __fr == 1:
+            fl_r += 1
+        fl_r = 0 - fl_r
+    ret fl_r
+
+class ceil (lstr ce_t):
+    var num ce_r = 0
+    scan(ce_t)
+    ce_r = __ip
+    if __neg == 0:
+        if __fr == 1:
+            ce_r += 1
     else:
-        __out = int(__w)
-        ret __out
+        ce_r = 0 - ce_r
+    ret ce_r
+
+class trunc (lstr tr_t):
+    var num tr_r = 0
+    scan(tr_t)
+    tr_r = __ip
+    if __neg == 1:
+        tr_r = 0 - tr_r
+    ret tr_r
+
+# ---- whole numbers --------------------------------------------------------------------------
+class abs (num ab_n):
+    var num ab_r = ab_n
+    if ab_n << 0:
+        ab_r = 0 - ab_n
+    ret ab_r
+
+class sign (num sg_n):
+    var num sg_r = 0
+    if sg_n >> 0:
+        sg_r = 1
+    elif sg_n << 0:
+        sg_r = -1
+    ret sg_r
+
+class min (num mn_a, num mn_b):
+    var num mn_r = mn_a
+    if mn_b << mn_a:
+        mn_r = mn_b
+    ret mn_r
+
+class max (num mx_a, num mx_b):
+    var num mx_r = mx_a
+    if mx_b >> mx_a:
+        mx_r = mx_b
+    ret mx_r
+
+class clamp (num cl_n, num cl_lo, num cl_hi):
+    var num cl_r = cl_n
+    if cl_n << cl_lo:
+        cl_r = cl_lo
+    if cl_n >> cl_hi:
+        cl_r = cl_hi
+    ret cl_r
+
+class mod (num md_a, num md_b):
+    var num md_r = 0
+    if md_b != 0:
+        md_r = md_a % md_b
+        if md_r != 0:
+            if md_r << 0:
+                if md_b >> 0:
+                    md_r += md_b
+            elif md_b << 0:
+                md_r += md_b
+    ret md_r
+
+class pow (num pw_b, num pw_e):
+    var num pw_r = 1
+    var num pw_i = 0
+    if pw_e << 0:
+        pw_r = 0
+    else:
+        for pw_i = pw_e:
+            pw_r = pw_r * pw_b
+    ret pw_r
+
+class sqrt (num sq_n):
+    var num sq_lo = 0
+    var num sq_hi = 0
+    var num sq_mid = 0
+    var num sq_sq = 0
+    if sq_n << 0:
+        ret -1
+    sq_hi = sq_n
+    if sq_hi >> 3037000499:
+        sq_hi = 3037000499
+    while sq_lo << sq_hi:
+        sq_mid = sq_lo + sq_hi
+        sq_mid += 1
+        sq_mid = sq_mid / 2
+        sq_sq = sq_mid * sq_mid
+        if sq_sq <= sq_n:
+            sq_lo = sq_mid
+        else:
+            sq_hi = sq_mid - 1
+    ret sq_lo
+
+class gcd (num gc_a, num gc_b):
+    var num gc_x = gc_a
+    var num gc_y = gc_b
+    var num gc_t = 0
+    if gc_x << 0:
+        gc_x = 0 - gc_x
+    if gc_y << 0:
+        gc_y = 0 - gc_y
+    while gc_y != 0:
+        gc_t = gc_y
+        gc_y = gc_x % gc_y
+        gc_x = gc_t
+    ret gc_x
+
+class lcm (num lc_a, num lc_b):
+    var num lc_g = 0
+    var num lc_r = 0
+    if lc_a != 0:
+        if lc_b != 0:
+            lc_g = call(gcd, lc_a, lc_b)
+            lc_r = lc_a / lc_g * lc_b
+            if lc_r << 0:
+                lc_r = 0 - lc_r
+    ret lc_r
+
+class factorial (num fa_n):
+    var num fa_r = 1
+    var num fa_i = 1
+    if fa_n << 0:
+        ret -1
+    if fa_n >> 20:
+        ret -1
+    while fa_i <= fa_n:
+        fa_r = fa_r * fa_i
+        fa_i += 1
+    ret fa_r
+
+class isprime (num ip_n):
+    var num ip_r = 1
+    var num ip_i = 2
+    if ip_n << 2:
+        ip_r = 0
+    var num ip_sq = 4
+    var num ip_m = 0
+    while ip_sq <= ip_n:
+        ip_m = ip_n % ip_i
+        if ip_m == 0:
+            ip_r = 0
+            ip_sq = ip_n + 1
+        else:
+            ip_i += 1
+            ip_sq = ip_i * ip_i
+    ret ip_r
+
+# ---- trigonometry ---------------------------------------------------------------------------
+# Angles are DEGREES, written as text decimals; the answers are text with six decimals.
+#   sin('30') -> '0.500000'   cos('60') -> '0.500000'   tan('45') -> '1.000000'   tan('90') -> 'undefined'
+#   asin('0.5') -> '30.000000'  acos('0.5') -> '60.000000'  atan('1') -> '45.000000'
+#   atan2(y, x) -> degrees from -180 (excluded) to 180, like the usual atan2
+#   sin_m(angle) and cos_m(angle) give the same value as a whole number of millionths
+#   (sin_m('30') is 500000), so the result can be used in calculations.
+# Accurate to about the sixth decimal (the last digit can be off by one); tan is less exact right
+# next to 90 and 270 degrees (within 0.01 degrees of them, tan can be off by several percent). asin / acos of anything outside -1 .. 1 give 'undefined'.
+# Values with more than six decimals are cut off after the sixth. For atan2 keep y under about 9000
+# (and x not much smaller than y / 1000000, or the answer rounds to 90).
+# Inside, angles are whole millionths of a degree and everything else is a fixed-point number
+# with nine decimals (so nothing here uses a fraction).
+var num __ts = 0
+var num __tc = 0
+var num __sx = 0
+var num __cx = 0
+var num __ang = 0
+
+# the text of a number of millionths:  -1234567 -> '-1.234567'
+def fmt (num v) lstr:
+    var num m = v
+    var lstr sg = ''
+    var num ipart = 0
+    var num fr = 0
+    var lstr z = ''
+    if v << 0:
+        m = 0 - v
+        sg = '-'
+    ipart = m / 1000000
+    fr = m % 1000000
+    if fr == 0:
+        ret sg,ipart,'.000000'
+    if fr << 10:
+        z = '00000'
+    elif fr << 100:
+        z = '0000'
+    elif fr << 1000:
+        z = '000'
+    elif fr << 10000:
+        z = '00'
+    elif fr << 100000:
+        z = '0'
+    ret sg,ipart,'.',z,fr
+
+# a number with nine decimals -> millionths, halves away from zero
+def micro (num v) num:
+    var num r = 0
+    if v << 0:
+        r = 0 - v
+        r += 500
+        r = r / 1000
+        r = 0 - r
+    else:
+        r = v + 500
+        r = r / 1000
+    ret r
+
+# sin and cos of an angle from 0 to 90 degrees (in millionths of a degree) -> __sx, __cx
+def sincos_q (num a):
+    var num x = 0
+    var num x2 = 0
+    var num t = 0
+    var num k = 0
+    var num d = 0
+    var num sm = 0
+    var num sg = 0
+    if a == 90000000:
+        __sx = 1000000000
+        __cx = 0
+        ret
+    x = a * 3141592654
+    x = x / 180000000
+    x2 = x * x
+    x2 = x2 / 1000000000
+    t = x
+    sm = x
+    k = 2
+    sg = -1
+    while t != 0:
+        t = t * x2
+        t = t / 1000000000
+        d = k * k
+        d += k
+        t = t / d
+        if sg << 0:
+            sm = sm - t
+        else:
+            sm = sm + t
+        sg = 0 - sg
+        k += 2
+    __sx = sm
+    t = 1000000000
+    sm = 1000000000
+    k = 1
+    sg = -1
+    while t != 0:
+        t = t * x2
+        t = t / 1000000000
+        d = k * k
+        d += k
+        t = t / d
+        if sg << 0:
+            sm = sm - t
+        else:
+            sm = sm + t
+        sg = 0 - sg
+        k += 2
+    __cx = sm
+
+# sin and cos of the angle in the text (degrees) -> __ts, __tc, with nine decimals
+def trig (lstr t):
+    var num a = 0
+    scan(t)
+    a = __mu % 360000000
+    if __neg == 1:
+        if a != 0:
+            a = 360000000 - a
+    if a <= 90000000:
+        sincos_q(a)
+        __ts = __sx
+        __tc = __cx
+    elif a <= 180000000:
+        sincos_q(180000000 - a)
+        __ts = __sx
+        __tc = 0 - __cx
+    elif a <= 270000000:
+        sincos_q(a - 180000000)
+        __ts = 0 - __sx
+        __tc = 0 - __cx
+    else:
+        sincos_q(360000000 - a)
+        __ts = 0 - __sx
+        __tc = __cx
+
+class sin (lstr sn_t):
+    var num sn_r = 0
+    trig(sn_t)
+    sn_r = micro(__ts)
+    ret fmt(sn_r)
+
+class cos (lstr cs_t):
+    var num cs_r = 0
+    trig(cs_t)
+    cs_r = micro(__tc)
+    ret fmt(cs_r)
+
+class sin_m (lstr sm_t):
+    trig(sm_t)
+    ret micro(__ts)
+
+class cos_m (lstr cm_t):
+    trig(cm_t)
+    ret micro(__tc)
+
+class tan (lstr tn_t):
+    var num tn_r = 0
+    var num tn_s = 0
+    var num tn_c = 0
+    var num tn_neg = 0
+    trig(tn_t)
+    if __tc == 0:
+        ret 'undefined'
+    tn_s = __ts
+    tn_c = __tc
+    if tn_s << 0:
+        tn_s = 0 - tn_s
+        tn_neg = 1
+    if tn_c << 0:
+        tn_c = 0 - tn_c
+        if tn_neg == 1:
+            tn_neg = 0
+        else:
+            tn_neg = 1
+    tn_r = tn_s * 1000000000
+    tn_r = tn_r / tn_c
+    tn_r = micro(tn_r)
+    if tn_neg == 1:
+        tn_r = 0 - tn_r
+    ret fmt(tn_r)
+
+# arctangent of a ratio (nine decimals, any size) -> __ang, millionths of a degree
+def atanfx (num r9):
+    var num m = r9
+    var num inv = 0
+    var num t = 0
+    var num t2 = 0
+    var num s = 0
+    var num p = 0
+    var num sm = 0
+    var num k = 0
+    var num sg = 0
+    var num h = 0
+    if r9 << 0:
+        m = 0 - r9
+    if m >> 1000000000:
+        m = 1000000000000000000 / m
+        inv = 1
+    t = m
+    for h = 2:
+        s = t * t
+        s += 1000000000000000000
+        s = call(sqrt, s)
+        s += 1000000000
+        t = t * 1000000000
+        t = t / s
+    t2 = t * t
+    t2 = t2 / 1000000000
+    sm = t
+    p = t
+    k = 3
+    sg = -1
+    while p != 0:
+        p = p * t2
+        p = p / 1000000000
+        s = p / k
+        if sg << 0:
+            sm = sm - s
+        else:
+            sm = sm + s
+        sg = 0 - sg
+        k += 2
+    sm = sm * 4
+    sm = sm * 180000000
+    sm = sm / 3141592654
+    if inv == 1:
+        sm = 90000000 - sm
+    if r9 << 0:
+        sm = 0 - sm
+    __ang = sm
+
+class atan (lstr at_t):
+    var num at_r = 0
+    scan(at_t)
+    at_r = __mu * 1000
+    if __neg == 1:
+        at_r = 0 - at_r
+    atanfx(at_r)
+    ret fmt(__ang)
+
+# arcsine in millionths of a degree -> __ang ; 1 when the value is outside -1 .. 1
+var num __bad = 0
+def asinfx (lstr t):
+    var num xm = 0
+    var num x9 = 0
+    var num c9 = 0
+    var num q = 0
+    scan(t)
+    xm = __mu
+    __bad = 0
+    if xm >> 1000000:
+        __bad = 1
+        ret
+    if xm == 1000000:
+        __ang = 90000000
+    else:
+        x9 = xm * 1000
+        c9 = x9 * x9
+        c9 = 1000000000000000000 - c9
+        c9 = call(sqrt, c9)
+        q = x9 * 1000000000
+        q = q / c9
+        atanfx(q)
+    if __neg == 1:
+        __ang = 0 - __ang
+
+class asin (lstr as_t):
+    asinfx(as_t)
+    if __bad == 1:
+        ret 'undefined'
+    ret fmt(__ang)
+
+class acos (lstr ac_t):
+    var num ac_r = 0
+    asinfx(ac_t)
+    if __bad == 1:
+        ret 'undefined'
+    ac_r = 90000000 - __ang
+    ret fmt(ac_r)
+
+class atan2 (lstr a2_y, lstr a2_x):
+    var num a2_ym = 0
+    var num a2_yneg = 0
+    var num a2_xm = 0
+    var num a2_xneg = 0
+    var num a2_r = 0
+    var num a2_d = 0
+    scan(a2_y)
+    a2_ym = __mu
+    a2_yneg = __neg
+    scan(a2_x)
+    a2_xm = __mu
+    a2_xneg = __neg
+    if a2_xm == 0:
+        if a2_ym == 0:
+            ret fmt(0)
+        a2_d = 90000000
+    else:
+        a2_r = a2_ym * 1000000000
+        a2_r = a2_r / a2_xm
+        atanfx(a2_r)
+        a2_d = __ang
+        if a2_xneg == 1:
+            a2_d = 180000000 - a2_d
+    if a2_yneg == 1:
+        if a2_ym != 0:
+            a2_d = 0 - a2_d
+    ret fmt(a2_d)
