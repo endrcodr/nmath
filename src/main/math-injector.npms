@@ -1,13 +1,13 @@
 # This file is what pushes the module into the code itself. It defines the name of the script, as well as holding the version, update date, and publisher data.
 # Package metadata
 packageName = "math"
-packageVersion = "0.0.1"
-updateDate = "10/27/26"
+packageVersion = "0.1.0"
+updateDate = "11/13/26"
 packageFileName = "math-module.ns"
 # Publisher data
 publisherName = "endrcodr"
 # SHA-256 Security Hash
-sha256 = "4da68a52928a79f0196ab9ee65cb9a195d8c7ee151adc575c59888155a586004"
-sha256-inj = "5dfdc430c4f7e2b046371feea36e6b31fb5bc194fefe71ef02fe6246135a03fa"
+sha256 = "6d877490f1278e69d4edecd9222039b70b30c4597826c6a11e24f3b409722adb"
+sha256-inj = "5ecd1aaf9c206b09210cbeacbd9131940c388af43655c7de2536883f4bd441ba"
 # More metadata will probably be added later, but this is all we need for now.
 # .npms extension stands for "Nano Package Metadata Storage". It is used exclusively for .ns packages as a way of identifying the security of a package.
