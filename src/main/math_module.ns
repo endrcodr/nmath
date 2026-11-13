@@ -1,7 +1,7 @@
 # This is the Math module for the Nano Project. It is coded entirely in Nano and injects directly to Nano with the import function. Its codebase handle is 'math'.
 #
-# Use it:      i\ math_module.ns
-#              var num r = call(round, '3.7')          # 4
+# Use it:      import math
+#              var num r = call round('3.7')          # 4
 #
 # Every function is a public class (only classes are shared between files; the defs and variables
 # below belong to this file alone). A class keeps its parameters as global names, so every parameter
